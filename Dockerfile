@@ -4,7 +4,9 @@ WORKDIR /frontend
 COPY pom.xml .
 COPY src/ ./src
 
-RUN MODEL_HOST="http://localhost:8081" mvn clean package
+ENV MODEL_HOST="http://localhost:8081"
+
+RUN mvn clean package
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "target/frontend-0.0.1-SNAPSHOT.jar"]
