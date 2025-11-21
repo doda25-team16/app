@@ -1,0 +1,71 @@
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK (for Maven)
+        uses: actions/setup-java@v4
+        with:
+            distribution: 'temurin'
+            java-version: '25'
+
+      - name: Parse version from pom.xml and validate tag
+        run: |
+          #1) Read version pom.xml using MVN
+          POM_VERSION=$(mvn -q -Dexec.cleanupDaemonThreads=false help:evaluate -D expression=project.version -D forceStdout)
+
+          echo "Version identified in pom.xml: $POM_VERSION"
+
+          #2 ) Parse version information from tag (example from in-class exercise w2)
+          # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
+          TAG_VERSION=${GITHUB_REF:11}
+        
+          echo "Version from tag: $TAG_VERSION"
+
+          #3) Ensure pon.xml & tag agrees
+          if [ "$POM_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: pom.xml version ($POM_VERSION) does not match tag version ($TAG_VERSION)"
+            exit 1
+          fi
+
+          VERSION="$POM_VERSION"
+
+          MAJOR=$(echo "$VERSION" | cut -d . -f 1)
+          MINOR=$(echo "$VERSION" | cut -d . -f 2)
+          PATCH=$(echo "$VERSION" | cut -d . -f 3)
+
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "version_major=$MAJOR" >> $GITHUB_ENV
+          echo "version_minor=$MINOR" >> $GITHUB_ENV
+          echo "version_patch=$PATCH" >> $GITHUB_ENV
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          IMG="ghcr.io/${{ github.repository }}"
+          IMG=${IMG@L} # lower-case the image
+
+          echo "Building image $IMG with version ${{ env.version }}"
+
+          docker build \
+            --tag $IMG:${{ env.version }} \
+            --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
+            --tag $IMG:${{ env.version_major }}.latest \
+            --tag $IMG:latest \
+            .
+          docker push --all-tags $IMG
