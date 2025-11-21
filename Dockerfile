@@ -13,5 +13,7 @@ COPY --from=build frontend/target/*.jar frontend.jar
 
 ENV MODEL_HOST="http://localhost:8081"
 
+ENV SERVER_PORT="8080"
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "frontend.jar"]
