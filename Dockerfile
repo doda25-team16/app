@@ -1,4 +1,4 @@
-FROM maven:3.9.11-eclipse-temurin-25 AS build
+FROM --platform=$BUILDPLATFORM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /frontend
 
 COPY pom.xml .
@@ -6,7 +6,7 @@ COPY src/ ./src
 
 RUN mvn clean package
 
-FROM eclipse-temurin:25-alpine
+FROM --platform=$TARGETPLATFORM eclipse-temurin:25-alpine 
 WORKDIR /frontend
 
 COPY --from=build frontend/target/*.jar frontend.jar
