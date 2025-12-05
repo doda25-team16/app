@@ -105,10 +105,6 @@ public class FrontendController {
         else if (sms.result.equals("ham")) {
             totalRequestsHam.incrementAndGet();
         }
-        else {
-            totalRequestsFailed.incrementAndGet();
-        }
-        activeRequests.decrementAndGet();
 
         return sms;
     }
@@ -119,18 +115,20 @@ public class FrontendController {
             var c = rest.build().postForEntity(url, sms, Sms.class);
             return c.getBody().result.trim();
         } catch (URISyntaxException e) {
+            totalRequestsFailed.incrementAndGet();
+            activeRequests.decrementAndGet();
             throw new RuntimeException(e);
         }
     }
 
-    @GetMapping("/metrics")
+    @GetMapping(value = "/metrics", produces = "text/plain; charset=UTF-8")
     @ResponseBody
     private String metrics() {
         StringBuilder response = new StringBuilder();
 
         response.append("# TYPE total_requests counter\n");
         response.append("total_requests{result=\"ham\"} ").append(totalRequestsHam.get()).append("\n");
-        response.append("total_requests{result=\"Failed\"} ").append(totalRequestsFailed.get()).append("\n");
+        response.append("total_requests{result=\"failed\"} ").append(totalRequestsFailed.get()).append("\n");
         response.append("total_requests{result=\"spam\"} ").append(totalRequestsSpam.get()).append("\n\n");
 
         response.append("# TYPE active_requests gauge\n");
