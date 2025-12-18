@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>sms</groupId>
 	<artifactId>frontend</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 
 	<properties>
 		<java.version>25</java.version>
@@ -32,7 +32,21 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.doda2025team16.libversion</groupId>
+			<artifactId>lib-version</artifactId>
+			<version>1.0.1-SNAPSHOT-Fix-versioning.19</version>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/doda25-team16/lib-version</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
