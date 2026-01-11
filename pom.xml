@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>com.doda2025team16.libversion</groupId>
 			<artifactId>lib-version</artifactId>
-			<version>1.0.1-SNAPSHOT-Fix-versioning.19</version>
+			<version>1.0.1</version>
 		</dependency>
 	</dependencies>
 
