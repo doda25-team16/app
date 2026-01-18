@@ -21,6 +21,8 @@ textarea {
 
 button {
 	margin: 10px 0;
+	background: #FFD400;
+	color: #000;
 }
 
 #result { display: none; display: inline;}
