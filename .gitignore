@@ -29,3 +29,6 @@ replay_pid*
 
 # Maven
 target/
+
+# Maven credentials
+maven-settings.xml
