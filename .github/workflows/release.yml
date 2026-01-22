@@ -68,6 +68,7 @@ jobs:
           BUILD_SECRET: ${{ secrets.GH_TOKEN }}
         run: |
           IMG="ghcr.io/${{ github.repository }}"
+          IMG="ghcr.io/ghcr.io/doda25-team16/sms-app"
           IMG=${IMG@L} # lower-case the image
 
           echo "Building image $IMG with version ${{ env.version }}"
