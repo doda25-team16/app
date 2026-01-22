@@ -10,7 +10,7 @@ RUN --mount=type=secret,id=github_token \
     GITHUB_TOKEN="$(cat /run/secrets/github_token)" \
     mvn -s /tmp/settings.xml -B clean package
 
-FROM --platform=$TARGETPLATFORM eclipse-temurin:25-alpine
+FROM eclipse-temurin:25-alpine
 WORKDIR /frontend
 
 COPY --from=build /frontend/target/*.jar frontend.jar
