@@ -34,6 +34,8 @@ public class FrontendController {
     private AtomicLong requestTimeCount = new AtomicLong(0);
     private Map<Double, AtomicInteger> requestTimeBuckets = new TreeMap<>();
 
+    // Button clicked metric
+    private AtomicInteger buttonClicked = new AtomicInteger(0);
 
     private String modelHost;
 
@@ -81,6 +83,9 @@ public class FrontendController {
     @PostMapping({ "", "/" })
     @ResponseBody
     public Sms predict(@RequestBody Sms sms) {
+        // Increment button clicked metric
+        buttonClicked.incrementAndGet();
+
         System.out.printf("Requesting prediction for \"%s\" ...\n", sms.sms);
         activeRequests.incrementAndGet();
 
@@ -125,6 +130,9 @@ public class FrontendController {
     @ResponseBody
     private String metrics() {
         StringBuilder response = new StringBuilder();
+
+        response.append("# TYPE button_clicked counter\n");
+        response.append("button_clicked ").append(buttonClicked.get()).append("\n\n");
 
         response.append("# TYPE total_requests counter\n");
         response.append("total_requests{result=\"ham\"} ").append(totalRequestsHam.get()).append("\n");
