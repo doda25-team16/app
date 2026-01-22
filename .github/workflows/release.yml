@@ -65,7 +65,7 @@ jobs:
         
       - name: Build and push multi-architecture images (arm64/amd64)
         env:
-          BUILD_SECRET=${{ secrets.GH_TOKEN }}
+          BUILD_SECRET="${{ secrets.GH_TOKEN }}"
         run: |
           IMG="ghcr.io/${{ github.repository }}"
           IMG=${IMG@L} # lower-case the image
