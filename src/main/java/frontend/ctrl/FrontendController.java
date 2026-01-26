@@ -85,33 +85,42 @@ public class FrontendController {
     public Sms predict(@RequestBody Sms sms) {
         // Increment button clicked metric
         buttonClicked.incrementAndGet();
+        
+        try {
 
-        System.out.printf("Requesting prediction for \"%s\" ...\n", sms.sms);
-        activeRequests.incrementAndGet();
+            System.out.printf("Requesting prediction for \"%s\" ...\n", sms.sms);
+            activeRequests.incrementAndGet();
 
-        long startTime = System.currentTimeMillis();
-        sms.result = getPrediction(sms);
-        System.out.printf("Prediction: %s\n", sms.result);
+            long startTime = System.currentTimeMillis();
+            sms.result = getPrediction(sms);
+            System.out.printf("Prediction: %s\n", sms.result);
 
-        long timeTaken = System.currentTimeMillis() - startTime;
-        requestTimeSum.addAndGet(timeTaken);
-        requestTimeCount.incrementAndGet();
+            long timeTaken = System.currentTimeMillis() - startTime;
+            requestTimeSum.addAndGet(timeTaken);
+            requestTimeCount.incrementAndGet();
 
-        for (Map.Entry<Double, AtomicInteger> bucket : requestTimeBuckets.entrySet()) {
-            if (timeTaken <= bucket.getKey()) {
-                bucket.getValue().incrementAndGet();
-                break;
+            for (Map.Entry<Double, AtomicInteger> bucket : requestTimeBuckets.entrySet()) {
+                if (timeTaken <= bucket.getKey()) {
+                    bucket.getValue().incrementAndGet();
+                    break;
+                }
             }
+
+            if (sms.result.equals("spam")) {
+                totalRequestsSpam.incrementAndGet();
+            }
+            else if (sms.result.equals("ham")) {
+                totalRequestsHam.incrementAndGet();
+            }
+
+            return sms;
+
+        } finally {
+            // Decrement active requests
+            activeRequests.decrementAndGet();
         }
 
-        if (sms.result.equals("spam")) {
-            totalRequestsSpam.incrementAndGet();
-        }
-        else if (sms.result.equals("ham")) {
-            totalRequestsHam.incrementAndGet();
-        }
 
-        return sms;
     }
 
     private String getPrediction(Sms sms) {
@@ -121,7 +130,6 @@ public class FrontendController {
             return c.getBody().result.trim();
         } catch (URISyntaxException e) {
             totalRequestsFailed.incrementAndGet();
-            activeRequests.decrementAndGet();
             throw new RuntimeException(e);
         }
     }

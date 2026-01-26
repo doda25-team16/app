@@ -12,7 +12,6 @@
 	<groupId>sms</groupId>
 	<artifactId>frontend</artifactId>
 	<version>0.0.9</version>
-
 	<properties>
 		<java.version>25</java.version>
 	</properties>
